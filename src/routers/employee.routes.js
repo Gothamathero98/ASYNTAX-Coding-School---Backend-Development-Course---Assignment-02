@@ -6,7 +6,8 @@ import { createEmployeeSchema } from '../models/employee.model.js';
 
 const router = Router();
 
-router.use(protect); // All employee routes require authentication
+router.use(protect);// All employee routes require authentication
+
 router.get( '/', employeeController.getAll);
 router.get( '/:id', employeeController.getById);
 router.post('/', validate(createEmployeeSchema), employeeController.create);

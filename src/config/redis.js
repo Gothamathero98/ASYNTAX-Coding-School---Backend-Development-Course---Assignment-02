@@ -1,4 +1,6 @@
 import { Redis } from "@upstash/redis"; 
+import 'dotenv/config'; 
+
 
 const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL,
@@ -6,8 +8,6 @@ const redis = new Redis({
 
 });
 
-await redis.set("foo", "bar");
-await redis.get("foo");
 
 export default redis;
 
