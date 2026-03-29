@@ -1,4 +1,4 @@
-import supabase from '../config/supbase.js';
+import supabase from '../config/supabase.js';
 import AppError from '../utils/appError.js'; 
 
 const TABLE = 'employees';

@@ -1,6 +1,6 @@
 import express from 'express';
 import { corsOptions } from './src/middlewares/cors.middleware.js';
-import { sanitiseInputs } from './src/middlewares/santotise.middleware.js';
+import { sanitiseInputs } from './src/middlewares/sanitise.middleware.js';
 import router from './src/routers/index.js';
 import { globalErrorHandler } from './src/utils/errorHandler.js';
 
