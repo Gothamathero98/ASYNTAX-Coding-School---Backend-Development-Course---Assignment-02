@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import redis from '../config/redis.js';
 import * as authRepo from '../repositories/auth.repository.js';
-import AppError from '../utils/AppError.js';
+import AppError from '../utils/appError.js';
 
 export const register = async ({ name, email, password }) => {
     const exists = await authRepo.findByEmail(email);
