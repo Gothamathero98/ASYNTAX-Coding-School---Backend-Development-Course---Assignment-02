@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import redis from '../config/redis.js';
-import AppError from './utils/appError.js';
+import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
 
 export const protect = catchAsync(async (req, res, next) => {

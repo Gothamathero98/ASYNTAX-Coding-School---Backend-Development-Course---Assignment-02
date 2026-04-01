@@ -1,4 +1,4 @@
-// src/routes/index.js
+// src/routers/index.js
 import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import employeeRoutes from './employee.routes.js';

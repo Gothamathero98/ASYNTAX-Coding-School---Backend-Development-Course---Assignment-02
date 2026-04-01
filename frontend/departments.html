@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>පිරිවු | ස්ටාෆ් කළමනාකරණ</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <a href="dashboard.html" class="logo">📊 සිටින්න කළමනාකරණ</a>
+      <ul class="nav-links">
+        <li><a href="dashboard.html">ඩැශබෝර්ඩ්</a></li>
+        <li><a href="employees.html">සිටින්නා</a></li>
+        <li><a href="departments.html" class="active">පිරිවු</a></li>
+        <li><a href="roles.html">කාර්යභාරය</a></li>
+        <li><a href="attendance.html">ස්තිතිය</a></li>
+      </ul>
+      <div class="user-menu">
+        <span id="userName" style="color: var(--text); font-weight: 600;"></span>
+        <button id="logoutBtn" class="logout-btn">ඉවත් වන්න</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="page-container">
+    <div class="container">
+      <h1 class="page-title">පිරිවු කළමනාකරණ</h1>
+
+      <div class="actions">
+        <input type="text" id="searchInput" placeholder="හැයිම්..." class="search-box">
+        <button class="btn btn-primary" onclick="document.getElementById('addModal').classList.add('active')">+ නව පිරිවුව</button>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table id="dataTable">
+            <thead>
+              <tr>
+                <th>නම</th>
+                <th>විස්තරය</th>
+                <th>ක්‍රියාවන්</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="3" style="text-align: center;">පූරණය වෙමින්...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="addModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('addModal').classList.remove('active')">&times;</button>
+      <div class="modal-header">පිරිවුව එක්කරගන්න</div>
+      <form id="dataForm">
+        <div class="form-group">
+          <label for="name">නම</label>
+          <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+          <label for="description">විස්තරය</label>
+          <textarea id="description" rows="3"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('addModal').classList.remove('active')">අවලංගු</button>
+          <button type="submit" class="btn btn-primary">එක්කරගන්න</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, departmentAPI, showAlert } from './api.js';
+
+    if (!auth.isAuthenticated()) window.location.href = 'login.html';
+
+    async function loadData() {
+      try {
+        const response = await departmentAPI.getAll();
+        const tbody = document.querySelector('#dataTable tbody');
+        tbody.innerHTML = '';
+
+        if (response.data && response.data.length > 0) {
+          response.data.forEach(item => {
+            tbody.innerHTML += `
+              <tr>
+                <td>${item.name}</td>
+                <td>${item.description || 'N/A'}</td>
+                <td>
+                  <button class="btn btn-primary btn-small" onclick="editItem('${item.id}')">සංස්කරණ</button>
+                  <button class="btn btn-danger btn-small" onclick="deleteItem('${item.id}')">මකා දමන්න</button>
+                </td>
+              </tr>
+            `;
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">දත්ත නැත</td></tr>';
+        }
+      } catch (error) {
+        showAlert('දත්ත පූරණය අසාර්ථක', 'error');
+      }
+    }
+
+    document.getElementById('dataForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await departmentAPI.create({
+          name: document.getElementById('name').value,
+          description: document.getElementById('description').value
+        });
+        showAlert('එක්කරගතා!', 'success');
+        document.getElementById('addModal').classList.remove('active');
+        document.getElementById('dataForm').reset();
+        loadData();
+      } catch (error) {
+        showAlert('එක්කිරීම අසාර්ථක විය', 'error');
+      }
+    });
+
+    window.deleteItem = async (id) => {
+      if (confirm('මකා දමන්න ඔබට නිශ්චිතද?')) {
+        try {
+          await departmentAPI.delete(id);
+          showAlert('මකා දැමුවා', 'success');
+          loadData();
+        } catch (error) {
+          showAlert('මකා දැමීම අසාර්ථක විය', 'error');
+        }
+      }
+    };
+
+    window.editItem = () => showAlert('සංස්කරණ තවම අඩිසිටගෙන ඇත', 'info');
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      auth.removeToken();
+      window.location.href = 'login.html';
+    });
+
+    loadData();
+  </script>
+</body>
+</html>

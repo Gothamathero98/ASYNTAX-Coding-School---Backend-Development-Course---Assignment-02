@@ -1,4 +1,4 @@
-import AppError from './utils/appError.js';
+import AppError from '../utils/appError.js';
 // Usage: router.post('/register', validate(registerSchema), authController.register)
 const validate = (schema) => (req, res, next) => {
     const { error } = schema.validate(req.body, { abortEarly: false });

@@ -1,5 +1,5 @@
 import supabase from '../config/supabase.js';
-import AppError from './utils/appError.js'; 
+import AppError from '../utils/appError.js'; 
 
 const TABLE = 'employees';
 export const findAll = async ({ page = 1, limit = 10 } = {}) => {
