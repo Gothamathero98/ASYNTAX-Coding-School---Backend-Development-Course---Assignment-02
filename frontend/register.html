@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ලියාපදිංචි වීම | ස්ටාෆ් කළමනාකරණ</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-container">
+    <div class="container">
+      <div style="max-width: 400px; margin: 4rem auto;">
+        <div class="card">
+          <div class="card-body">
+            <div style="text-align: center; margin-bottom: 2rem;">
+              <h1 style="color: var(--primary); font-size: 2rem;">ගිණුම සෑදීම</h1>
+              <p style="color: var(--text-muted); margin-top: 0.5rem;">නව ගිණුමක් ලියාපදිංචි කරන්න</p>
+            </div>
+
+            <form id="registerForm">
+              <div class="form-group">
+                <label for="name">සම්පූර්ණ නම</label>
+                <input type="text" id="name" name="name" placeholder="ඔබගේ නම" required>
+              </div>
+
+              <div class="form-group">
+                <label for="email">ඊ-තැපෙල්</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+              </div>
+
+              <div class="form-group">
+                <label for="password">පරිමාණ</label>
+                <input type="password" id="password" name="password" placeholder="අවම වශයෙන් 6 අක්ෂර" required minlength="6">
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">පරිමාණ ස්ථිර කරන්න</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="●●●●●●●●" required minlength="6">
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                ලියාපදිංචි වන්න
+              </button>
+            </form>
+
+            <div style="text-align: center; border-top: 1px solid #ddd; padding-top: 1rem;">
+              <p>දැනටමත් ගිණුමක් තිබෙනවද? <a href="login.html" style="color: var(--primary); font-weight: 600;">ඇතුරු වන්න</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { authAPI, auth, showAlert } from './api.js';
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      try {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+          showAlert('පරිමාණ ගැලපෙන්නේ නැත', 'error');
+          return;
+        }
+        
+        await authAPI.register(name, email, password);
+        showAlert('ලියාපදිංචි සාර්ථක විය! දැන් ඇතුරු වන්න', 'success');
+        setTimeout(() => window.location.href = 'login.html', 1500);
+      } catch (error) {
+        showAlert(error.message || 'ලියාපදිංචි අසාර්ථක විය', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ඩැශබෝර්ඩ් | ස්ටාෆ් කළමනාකරණ</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header>
+    <nav class="container">
+      <a href="dashboard.html" class="logo">📊 සිටින්න කළමනාකරණ</a>
+      
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="active">ඩැශබෝර්ඩ්</a></li>
+        <li><a href="employees.html">සිටින්නා</a></li>
+        <li><a href="departments.html">පிரிவු</a></li>
+        <li><a href="roles.html">කාර්යභාරය</a></li>
+        <li><a href="attendance.html">ස්থිතිය</a></li>
+      </ul>
+
+      <div class="user-menu">
+        <span id="userName" style="color: var(--text); font-weight: 600;"></span>
+        <button id="logoutBtn" class="logout-btn">ඉවත් වන්න</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Page Content -->
+  <div class="page-container">
+    <div class="container">
+      <h1 class="page-title">ඩැශබෝර්ඩ්</h1>
+
+      <!-- Stats Grid -->
+      <div class="grid">
+        <div class="stat-card">
+          <h3>Total සිටින්නා</h3>
+          <div class="number" id="totalEmployees">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Total පිරිවු</h3>
+          <div class="number" id="totalDepartments">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Total කාර්යභාරය</h3>
+          <div class="number" id="totalRoles">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>අද සිටිහරු</h3>
+          <div class="number" id="todayPresent">0</div>
+        </div>
+      </div>
+
+      <!-- Recent Employees -->
+      <div class="card">
+        <div class="card-header">
+          <h2>මෑතකාලීන සිටින්නා</h2>
+          <a href="employees.html" class="btn btn-primary btn-small">සියල්ල බලන්න</a>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table id="recentEmployeesTable">
+              <thead>
+                <tr>
+                  <th>නම</th>
+                  <th>ඊ-තැපෙල්</th>
+                  <th>ෆোන්</th>
+                  <th>පිරිවුව</th>
+                  <th>කාර්යභාරය</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted);">
+                    <div class="loading"></div> නැතුවම...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, employeeAPI, departmentAPI, roleAPI, attendanceAPI, showAlert } from './api.js';
+
+    // Check authentication
+    if (!auth.isAuthenticated()) {
+      window.location.href = 'login.html';
+    }
+
+    // Load dashboard data
+    async function loadDashboard() {
+      try {
+        // Load employee count
+        const employees = await employeeAPI.getAll();
+        document.getElementById('totalEmployees').textContent = employees.data.count || 0;
+
+        // Display recent employees
+        const tbody = document.querySelector('#recentEmployeesTable tbody');
+        tbody.innerHTML = '';
+        
+        if (employees.data.data && employees.data.data.length > 0) {
+          employees.data.data.slice(0, 5).forEach(emp => {
+            tbody.innerHTML += `
+              <tr>
+                <td>${emp.first_name} ${emp.last_name}</td>
+                <td>${emp.email}</td>
+                <td>${emp.phone || 'N/A'}</td>
+                <td>${emp.departments?.name || 'N/A'}</td>
+                <td>${emp.roles?.title || 'N/A'}</td>
+              </tr>
+            `;
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">කිසිදු සිටින්නා නැත</td></tr>';
+        }
+
+        // Load departments count
+        const departments = await departmentAPI.getAll();
+        document.getElementById('totalDepartments').textContent = departments.data.length || 0;
+
+        // Load roles count
+        const roles = await roleAPI.getAll();
+        document.getElementById('totalRoles').textContent = roles.data.length || 0;
+
+      } catch (error) {
+        showAlert('දත්ත පූරණය කිරීම අසාර්ථක විය', 'error');
+      }
+    }
+
+    // Load user profile
+    async function loadUserProfile() {
+      try {
+        const profile = await authAPI.getProfile();
+        document.getElementById('userName').textContent = profile.data.name || 'පරිශීලක';
+      } catch (error) {
+        console.error('Profile loading failed:', error);
+      }
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await authAPI.logout();
+        auth.removeToken();
+        window.location.href = 'login.html';
+      } catch (error) {
+        auth.removeToken();
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Initialize
+    loadUserProfile();
+    loadDashboard();
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ඉතිරි - ඒකක්ෂ (Login) | ස්ටාෆ් කළමනාකරණ</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-container">
+    <div class="container">
+      <div style="max-width: 400px; margin: 4rem auto;">
+        <div class="card">
+          <div class="card-body">
+            <div style="text-align: center; margin-bottom: 2rem;">
+              <h1 style="color: var(--primary); font-size: 2rem;">ක්‍රම වෙත ඇතුරුවීම</h1>
+              <p style="color: var(--text-muted); margin-top: 0.5rem;">ඔබගේ ගිණුමට ඇතුරු වන්න</p>
+            </div>
+
+            <form id="loginForm">
+              <div class="form-group">
+                <label for="email">ඊ-තැපෙල්</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+              </div>
+
+              <div class="form-group">
+                <label for="password">පරිමාණ</label>
+                <input type="password" id="password" name="password" placeholder="●●●●●●●●" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                ඇතුරුවීම
+              </button>
+            </form>
+
+            <div style="text-align: center; border-top: 1px solid #ddd; padding-top: 1rem;">
+              <p>ගිණුමක් නෑද? <a href="register.html" style="color: var(--primary); font-weight: 600;">ලියාපදිංචි වන්න</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { authAPI, auth, showAlert } from './api.js';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      try {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        const response = await authAPI.login(email, password);
+        auth.setToken(response.data.token);
+        
+        showAlert('උසස් සාර්ථක ඇතුරුවීම!', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+      } catch (error) {
+        showAlert(error.message || 'ඇතුරුවීම අසාර්ථක විය', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
